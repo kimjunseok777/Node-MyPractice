@@ -7,10 +7,11 @@ use kjs;
 
 create table users (
 	id bigint primary key auto_increment,
-    /*auto_increment 는 숫자 자동으로 1씩 증가시키는 것  -->  default value 이다*/
+    /*id를 pk로 지정해주고, auto_increment 는 숫자 자동으로 1씩 증가시키는 것  -->  default value 가 된다*/
     name varchar(100) not null,
     /*100byte 를 넘지만 않으면 되는 것이다  -->  100byte 를 차지한다는 게 아니다*/
     email varchar(100) not null unique,
+    /*unique 는 겹치는 값이 있으면 안된다*/
     passwrod varchar(100) not null
 );
 
@@ -26,10 +27,12 @@ values ('이멜론', 'melon@melon.com', '1234');
 
 insert into users (name, email, password)
 values('반하나', 'banana@banana.com', '1234');
+/*users라는 테이블에서 컬럼명들 (김사과, 이멜론, 반하나) 만들어준 것이다*/
 
 delete from users where id = 1;
 /*그냥 delete from users 하게 되면 데이터 다 날아간다  -->  뭐 지울지 where 로 명시해주자*/
 update users set email = "kjs@kjs.com" where id = 3;
+/*users라는 테이블에서 id 가 3인 컬럼의 email을 갱신해준 것이다*/
 
 select * from users;
 select name from users;
@@ -46,6 +49,7 @@ insert into product (name, price)
 values('기계식 키보드', '30000');
 insert into product (name, price)
 values('기계식 마우스', '20000');
+/*처음에 product테이블 만들 때 price, name 에 not null 스키마를 넣어줬기에, 반드시 값 넣어줘야한다*/
 
 select * from product;
 
@@ -62,15 +66,15 @@ create table purchase_histories(
 );
 
 insert into purchase_histories (userId, productId) values(2, 1);
-/*users의 id 1번인 김사과는 delete했으니, users는 2번 설정해준 것*/
+/*users의 id 1번인 김사과는 delete했으니, users는 id는 2번으로 설정해준 것*/
 
 /*
 join 의 종류 :
-	1. inner -- a(prodcutId=3, 5, 7), b(id=1, 3, 5) --> 겹치는 id 인 3, 5 만 가져온다
+	1. inner join -- a(prodcutId=3, 5, 7), b(id=1, 3, 5) --> 겹치는 id 인 3, 5 만 가져온다
 		--> a 테이블에도 prodcutId 가 있다면, b 테이블에도 id 가 있는 친구들만 가져온다
         
     2. outer join -- a(prodcutId=3, 5, 7), b(id=1, 3, 5) --> 겹치든 안겹치든 데이터 다 가져온다
-		--> 1, 3, 5, 7 다 가져오는데, 1번은 a의 prodcutId에 없기에 null 로 가져온다
+		--> 1, 3, 5, 7 다 가져오는데, 1번은 a의 prodcutId 에 없기에 null 로 가져온다
         
 	--> inner 는 null 이 아닌 것들만 가져오는 것, outer 는 null 인 것들까지 다 가져오는 것
     
