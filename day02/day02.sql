@@ -36,9 +36,9 @@ update users set email = "kjs@kjs.com" where id = 3;
 
 select * from users;
 select name from users;
-select * from users where id = 1; /*--> id가 1인 김사과 삭제했기에 null 로 비어있다*/
+select * from users where id = 1; /*--> id가 1인 김사과 삭제했기에 null 로 비어있는 상태로 보인다*/
 
-/*--------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------------*/
 
 create table product (
 	id bigint primary key auto_increment,
@@ -53,7 +53,7 @@ values('기계식 마우스', '20000');
 
 select * from product;
 
-/*--------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------------------------*/
 /*구매내역 만들기*/
 
 create table purchase_histories(
