@@ -5,6 +5,9 @@ import bcrypt from "bcrypt"
 
 const router = express.Router()
 
+//-----------------------------------------------------------------------------------------------------------------------
+// 회원가입 :
+
 router.post("/sign-up", async (req, res) => {
     const {email, password} = req.body
     const existUser = await Users.findOne({ //-->  findOne 은 하나만 찾겠다는 의미이다
@@ -29,7 +32,52 @@ router.post("/sign-up", async (req, res) => {
         ok: true,
         message: "회원가입을 축하합니다"
     })
+})
 
+//-----------------------------------------------------------------------------------------------------------------------
+// 로그인 :
+
+router.post("/sign-in", async(req, res) => {
+    const {email, password} = req.body
+    //-->  회원가입에서 bcrypt 로 비밀번호를 암호화했었다  -->  이 bcrypt 를 반드시 풀어야한다
+
+    const user = await Users.findOne({
+        where: {
+            email
+        }
+    }) //-->  이메일에 맞는 유저 정보가 저장이 된다
+
+    // user 의 값은 있을 수도 있고, 없을 수도 있다  -->  회원가입이 안된 이메일이면 없을 수 있다  -->  user 가 없다면 어떻게 할건지 정의해야된다
+    if(!user) { //-->  user 가 존재하지 않다면 ~
+        return res.json({
+            ok: false, //-->  유효성을 어긴 것도 아니고, 요청은 성공 했기에 에러를 던지는 것이 아니라 ok 에 false 값을 넣어서 res 보내는 것이다 (에러 보내도 된다)
+            message: "존재하지 않는 사용자입니다"
+            //-->  에러가 난 것은 아니고, 맞지 않다라는 응답을 보내는 것이니 일반 응답값으로 보내준 것 (백엔드마다 다르다  -->  에러로 간주해도 된다)
+            //-->  return res.status(400).json({ ... })  -->  이렇게 에러로 보내도 된다
+        })
+    }
+
+    // 여기서 email 에서 찾은 DB 에 있는 비밀번호 값과 요청받은 비밀번호 값이 일치한지 확인해볼 것이다
+    const isMatchPassword = await bcrypt.compare(password, user.password) //-->  일치하면 true 가 할당된다 / 불일치하면 false 가 할당된다
+    //                                                                                 ( 입력한 비번 , DB 에 저장된 비번 )
+    //-->  1번째는 사용자가 요청한 (로그인에서 입력한) 비번, 2번째는 비밀번호는 db 에 저장되어 있는 값  -->  이 두개가 일치하는지 비교하는 것이다
+    if(!isMatchPassword) {
+        return res.json({
+            ok: false,
+            message: "비밀번호를 다시 확인해주세요"
+        })
+    } //-->  이렇게 유저가 존재하지 않거나, 비밀번호가 일치하지 않을 때 예외처리를 해주면 된다  -->  여기에 예외처리 되지 않으면 성공적으로 로그인 되는 것이다
+
+    return res.json({
+        ok: true,
+        message: `${user.email}님 환영합니다`, //-->  메세지는 굳이 안보내도 된다 (삭제해도 된다)
+        info: {
+            email: user.email,
+            // nickName, profile_url, token ... 등등 을 전달하면 된다
+        },
+        token: "123"
+        //-->  로그인 로직 모두 작성했고, 이제 토큰만 만들어주면 된다
+    })
 })
 
 export default router
