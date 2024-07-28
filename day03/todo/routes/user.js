@@ -1,6 +1,8 @@
 import express from "express"
 import Users from "../models/user.model.js"
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+import { JwtAuth } from "../middleware/jwtAuth.js"
 
 
 const router = express.Router()
@@ -37,7 +39,9 @@ router.post("/sign-up", async (req, res) => {
 //-----------------------------------------------------------------------------------------------------------------------
 // 로그인 :
 
-router.post("/sign-in", async(req, res) => {
+router.post("/sign-in", JwtAuth,async(req, res) => {
+    // 미들웨어 JwtAuth 사이에 끼워주었다  -->  jwt 를 디코드하고, req.user 에 id 값을 넣어서 전달해준다 (req 데이터를 중간에서 가공해준 것이다)
+    
     const {email, password} = req.body
     //-->  회원가입에서 bcrypt 로 비밀번호를 암호화했었다  -->  이 bcrypt 를 반드시 풀어야한다
 
@@ -68,6 +72,17 @@ router.post("/sign-in", async(req, res) => {
         })
     } //-->  이렇게 유저가 존재하지 않거나, 비밀번호가 일치하지 않을 때 예외처리를 해주면 된다  -->  여기에 예외처리 되지 않으면 성공적으로 로그인 되는 것이다
 
+    //----------------------------------------------------------------------------------------
+    // jwt :
+    const token = jwt.sign({
+        id: user.id, //-->  이 유저를 의미하는 고유한 값
+    }, process.env.JWT_SECRET, {
+        expiresIn: 1000 * 60 * 5, //-->  밀리세컨즈이다  -->  1초 x 60 x 5  -->  5분이다  -->  expiresIn : 토큰을 얼마나 유지시킬 것인지 적으면 된다
+        // 이렇게 하면 토큰이 생성이 된다
+    })
+
+    //----------------------------------------------------------------------------------------
+
     return res.json({
         ok: true,
         message: `${user.email}님 환영합니다`, //-->  메세지는 굳이 안보내도 된다 (삭제해도 된다)
@@ -75,8 +90,10 @@ router.post("/sign-in", async(req, res) => {
             email: user.email,
             // nickName, profile_url, token ... 등등 을 전달하면 된다
         },
-        token: "123"
+        // token : "123"
+        token
         //-->  로그인 로직 모두 작성했고, 이제 토큰만 만들어주면 된다
+        //-->  token: "123"  -->  위에서 만든 token 변수로 바꿔주었다 (jwt 적용시킨 token)
     })
 })
 

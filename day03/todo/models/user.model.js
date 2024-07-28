@@ -25,6 +25,14 @@ class Users extends Model {
             sequelize,
         })
     }
+
+    // 이렇게 투두 테이블 모두 만들었으면, 이제 관계지어주자
+    static associate(db) {
+        db.Users.hasMany(db.Todo, { //-->  이렇게 Users 에 hasMany 가 걸려있어야 투두를 여러개 가져올 수 있는 것이다
+            foreignKey: {name: "userId", allowNull: false},
+        })
+    }
+
 }
 
 // 위에 static 을 안해주면 -->  Users.init() 이렇게 접근 못한다  -->  다른 곳에다가 데이터를 받고 새로운 연산자가 생성이 되어야지만 init 할 수 있다
