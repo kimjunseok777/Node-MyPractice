@@ -5,19 +5,20 @@ use kjs;
 /* kjs 데이터베이스를 사용하겠다고 명시한 것  -->  왼쪽에 사용하는 데이터베이스 글씨 진하게 뜬다 */
 
 
+/* kjs 데이터베이스 안에 users 라는 테이블을 만들어준 것 */
 create table users (
 	id bigint primary key auto_increment,
-    /*id를 pk로 지정해주고, auto_increment 는 숫자 자동으로 1씩 증가시키는 것  -->  default value 가 된다*/
+    /*id를 pk로 지정해주고, auto_increment 는 숫자 자동으로 1씩 증가시키는 것  -->  default value 가 된다  -->  insert 할 때 따로 id 값 만들어주지 않아도 된다*/
     name varchar(100) not null,
     /*100byte 를 넘지만 않으면 되는 것이다  -->  100byte 를 차지한다는 게 아니다*/
     email varchar(100) not null unique,
     /*unique 는 겹치는 값이 있으면 안된다*/
     passwrod varchar(100) not null
 );
-
+/*--> id 는 기본값 만들어줬기에, name, email, password 만 insert 로 데이터 넣어주면 id 는 기본값으로 자동 생성된다*/
 
 alter table users change column passwrod password varchar(100);
-/*users 라는 테이블에서 컬럼명 passwrod 의 이름을 변경시켜준 것*/
+/*users 라는 테이블에서 컬럼명 passwrod 의 이름을 password 로 변경시켜준 것*/
 
 insert into users (name, email, password)
 values('김사과', 'apple@apple.com', '1234');
@@ -37,9 +38,11 @@ update users set email = "kjs@kjs.com" where id = 3;
 select * from users;
 select name from users;
 select * from users where id = 1; /*--> id가 1인 김사과 삭제했기에 null 로 비어있는 상태로 보인다*/
+select * from users where id = 2; /*--> id가 2인 이멜론을 가져올 수 있다*/
 
 /*----------------------------------------------------------------------------------------------*/
 
+/* kjs 데이터베이스에 product 라는 이름으로 테이블 생성해준 것이다 */
 create table product (
 	id bigint primary key auto_increment,
     price varchar(100) not null,
@@ -56,17 +59,20 @@ select * from product;
 /*----------------------------------------------------------------------------------------------*/
 /*구매내역 만들기*/
 
+/*구매내역 관계지어주기 위해 새로운 테이블 하나 더 만들어준 것이다*/
 create table purchase_histories(
 	id bigint primary key auto_increment,
     userId bigint,
     productId bigint,
     foreign key (userId) references users(id),
+    /*userId 와 users 테이블의 id 와 관계지어준 것이다*/
     foreign key (productId) references product(id)
     /*productId 와 product 테이블의 id 와 관계지어준 것이다*/
 );
 
 insert into purchase_histories (userId, productId) values(2, 1);
-/*users의 id 1번인 김사과는 delete했으니, users는 id는 2번으로 설정해준 것*/
+/*users의 id 1번인 김사과는 delete했으니, users의 id는 2번으로 설정해준 것*/
+/*--> "이멜론" 이 "기계식키보드" 를 구매했다는 구매내역을 만들어준 것이다*/
 
 /*
 join 의 종류 :
@@ -87,6 +93,7 @@ outer : 이미지 다 가져오고 싶은데, 없는 건 그냥 null 로 보여�
 */
 
 select * from purchase_histories;
+
 /*join query 사용한 것*/
 select * from purchase_histories inner join product
 on purchase_histories.productId = product.id;

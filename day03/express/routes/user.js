@@ -2,6 +2,7 @@ import express from "express"
 
 
 const router = express.Router()
+
 router.post("/sign-up", (req, res) => {
     // 백엔드는 DB 에 data 를 insert 한다
     //-->  insert 전에 중복되는 계정이 있는지 검사해야한다
