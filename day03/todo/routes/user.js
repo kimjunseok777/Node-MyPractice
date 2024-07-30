@@ -14,7 +14,7 @@ router.post("/sign-up", async (req, res) => {
     const {email, password} = req.body
     const existUser = await Users.findOne({ //-->  findOne 은 하나만 찾겠다는 의미이다
         where: {
-            email
+            email //-->  위의 body 에서 객체구조분해할당 해준 email 이다  -->  즉, 사용자가 입력한 이메일과 db 에 일치하는 이메일이 있는지 찾는 것이다
         }
     })
 
@@ -39,7 +39,7 @@ router.post("/sign-up", async (req, res) => {
 //-----------------------------------------------------------------------------------------------------------------------
 // 로그인 :
 
-router.post("/sign-in", JwtAuth,async(req, res) => {
+router.post("/sign-in", JwtAuth, async(req, res) => {
     // 미들웨어 JwtAuth 사이에 끼워주었다  -->  jwt 를 디코드하고, req.user 에 id 값을 넣어서 전달해준다 (req 데이터를 중간에서 가공해준 것이다)
     
     const {email, password} = req.body
@@ -49,12 +49,12 @@ router.post("/sign-in", JwtAuth,async(req, res) => {
         where: {
             email
         }
-    }) //-->  이메일에 맞는 유저 정보가 저장이 된다
+    }) //-->  회원가입으로 등록된 이메일이 있는지 Users 테이블에서 찾는 것이다  -->  값이 없다면 존재하지 않는 회원으로 로그인하려 한 것이된다
 
     // user 의 값은 있을 수도 있고, 없을 수도 있다  -->  회원가입이 안된 이메일이면 없을 수 있다  -->  user 가 없다면 어떻게 할건지 정의해야된다
-    if(!user) { //-->  user 가 존재하지 않다면 ~
+    if(!user) { //-->  user 가 존재하지 않다면 아래의 json 데이터로 res 보내주는 것이다
         return res.json({
-            ok: false, //-->  유효성을 어긴 것도 아니고, 요청은 성공 했기에 에러를 던지는 것이 아니라 ok 에 false 값을 넣어서 res 보내는 것이다 (에러 보내도 된다)
+            ok: false, //-->  유효성을 어긴 것도 아니고, 요청은 성공 했기에, 에러를 던지는 것이 아니라 ok 에 false 값을 넣어서 res 보내는 것이다 (에러 보내도 된다)
             message: "존재하지 않는 사용자입니다"
             //-->  에러가 난 것은 아니고, 맞지 않다라는 응답을 보내는 것이니 일반 응답값으로 보내준 것 (백엔드마다 다르다  -->  에러로 간주해도 된다)
             //-->  return res.status(400).json({ ... })  -->  이렇게 에러로 보내도 된다
@@ -63,7 +63,8 @@ router.post("/sign-in", JwtAuth,async(req, res) => {
 
     // 여기서 email 에서 찾은 DB 에 있는 비밀번호 값과 요청받은 비밀번호 값이 일치한지 확인해볼 것이다
     const isMatchPassword = await bcrypt.compare(password, user.password) //-->  일치하면 true 가 할당된다 / 불일치하면 false 가 할당된다
-    //                                                                                 ( 입력한 비번 , DB 에 저장된 비번 )
+    //                                                                                 ( 입력한 비번 , DB 에 저장된 비번 --> 위에서 입력한 이메일과 일치하는 db 에 있는 이메일 찾은 것이다 )
+    //-->  위에서 찾은 user 의 비밀번호와, 사용자가 입력한 비밀번호가 일치한지 비교하는 것이다  -->  일치하면 true 가 뜬다
     //-->  1번째는 사용자가 요청한 (로그인에서 입력한) 비번, 2번째는 비밀번호는 db 에 저장되어 있는 값  -->  이 두개가 일치하는지 비교하는 것이다
     if(!isMatchPassword) {
         return res.json({

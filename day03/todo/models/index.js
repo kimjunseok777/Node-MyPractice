@@ -7,7 +7,7 @@ import Todo from './todo.model.js'
 
 // const database = config['development']
 const database = dbConfig['development']
-const db = {}
+const db = {} //-->  밑에서 export default 로 export 시켜줬다  -->  app.js 에서 객체와 이 db 가 맵핑된다 (ORM 중 sequelize 가 사용된다)
 
 const sequelize = new Sequelize(
   database.database,
@@ -19,8 +19,9 @@ const sequelize = new Sequelize(
 //---------------------------------------------------------------
 
 db.Users = Users
-//-->  user.model.js 에서 만들어준 테이블 설치해준 것이다
+//-->  user.model.js 에서 만들어준 테이블 설치해준 것이다  -->  users 라는 이름으로 테이블이 생성된다
 db.Todo = Todo
+//-->  todo 테이블 생성해준 것이다
 
 // db.Users.init(sequelize)  -->  테이블이 투두만 생기고 끝나는 것이 아니라, 다른 테이블도 계속 생길 수 있기 때문에,
 // 아래처럼 forEach 돌려서 순회해서 실행시켜주는 것이 좋다
@@ -35,7 +36,7 @@ Object.keys(db).forEach((modal) => {
 
 Object.keys(db).forEach((model) => {
   if(db[model].associate) { //-->  만약 db 의 model 에 associate 함수가 존재한다면
-    db[model].associate(db) //-->  db 의 model 에 associate 의 db 을 넣어서 실행하겠다는 의미이다
+    db[model].associate(db) //-->  db 의 model 에 associate 의 db 를 넣어서 실행하겠다는 의미이다
   }
 })
 

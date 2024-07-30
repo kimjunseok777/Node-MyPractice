@@ -8,7 +8,6 @@ class Todo extends Model {
             title: {
                 type: Sequelize.STRING(300), //-->  이거 스트링 갯수 너무 많이 할당되면 오류 뜰 수도 있다  -->  많이 쓸거면 그냥 TEXT 로 바꿔주자
                 allowNull: false,
-                unique: true
             },
             content: {
                 type: Sequelize.TEXT(),
@@ -20,7 +19,7 @@ class Todo extends Model {
             }
         }, {
             modelName: "Todos",
-            tableName: "todos",
+            tableName: "todos", //-->  테이블 명 지어준 것
             charset: "utf8mb4", //-->  mb4 까지 붙여주면 이모지까지 지원을 하겠다는 의미이다
             timestamps: true,
             sequelize,
